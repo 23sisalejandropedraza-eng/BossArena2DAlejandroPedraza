@@ -1314,6 +1314,7 @@ GameObject:
   - component: {fileID: 638069140}
   - component: {fileID: 638069139}
   - component: {fileID: 638069138}
+  - component: {fileID: 638069143}
   m_Layer: 0
   m_Name: Tilemap_Agua
   m_TagString: Untagged
@@ -1648,7 +1649,7 @@ TilemapRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -1
   m_ChunkSize: {x: 32, y: 32, z: 32}
-  m_ChunkCullingBounds: {x: 0.012000024, y: 0.012000024, z: 0}
+  m_ChunkCullingBounds: {x: 0.03333336, y: 0.325, z: 0}
   m_MaxChunkCount: 16
   m_MaxFrameAge: 16
   m_SortOrder: 0
@@ -1841,6 +1842,51 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!114 &638069143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 638069136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51e09e6f66256e7479e40823d3c640e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dano: 1
+  empujeArriba: 7
+--- !u!1 &934194272
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 934194273}
+  m_Layer: 0
+  m_Name: PuntoAtaque
+  m_TagString: Untagged
+  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &934194273
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 934194272}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.46, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 935231449}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &935231444
 GameObject:
   m_ObjectHideFlags: 0
@@ -1854,9 +1900,10 @@ GameObject:
   - component: {fileID: 935231447}
   - component: {fileID: 935231446}
   - component: {fileID: 935231445}
+  - component: {fileID: 935231450}
   m_Layer: 0
   m_Name: Jugador
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1925,7 +1972,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.9, y: 1.55}
+  m_Size: {x: 0.9, y: 1.2}
   m_EdgeRadius: 0
 --- !u!50 &935231447
 Rigidbody2D:
@@ -2015,12 +2062,39 @@ Transform:
   m_GameObject: {fileID: 935231444}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.4034, y: -2.1134, z: 0}
+  m_LocalPosition: {x: -6.4034, y: -2.24, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1885487018}
+  - {fileID: 934194273}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &935231450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 935231444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43603b49454b4404782c5fd3e8f0f8d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  velocidad: 6
+  fuerzaSalto: 6
+  puntoSuelo: {fileID: 1885487018}
+  radioSuelo: 0.2
+  capaSuelo:
+    serializedVersion: 2
+    m_Bits: 8
+  puntoAtaque: {fileID: 934194273}
+  radioAtaque: 0.7
+  danoAtaque: 1
+  tiempoEntreAtaques: 0.35
+  vidaMaxima: 5
+  tiempoInvulnerable: 1
 --- !u!1 &1707995764
 GameObject:
   m_ObjectHideFlags: 0
@@ -2066,6 +2140,37 @@ Transform:
   - {fileID: 519778315}
   - {fileID: 638069137}
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1885487017
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1885487018}
+  m_Layer: 0
+  m_Name: PuntoSuelo
+  m_TagString: Untagged
+  m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1885487018
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885487017}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.11, y: -0.47, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 935231449}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

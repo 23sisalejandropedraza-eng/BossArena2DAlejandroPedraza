@@ -21,14 +21,17 @@ public class JugadorControlador : MonoBehaviour, IDaniable
 
     [Header("Vida")]
     public int vidaMaxima = 5;
+    public float tiempoInvulnerable = 1f;
     private int vidaActual;
     private bool estaMuerto;
+    private float finInvulnerabilidad;
 
     private Rigidbody2D rb;
     private Animator anim;
     private float moverX;
     private bool enSuelo;
     private float siguienteAtaque;
+    private bool enAgua;
 
     void Start()
     {
@@ -110,9 +113,11 @@ public class JugadorControlador : MonoBehaviour, IDaniable
 
     public void RecibirDano(int cantidad)
     {
-        if (estaMuerto) return;
+        if (estaMuerto || Time.time < finInvulnerabilidad) return;
 
+        finInvulnerabilidad = Time.time + tiempoInvulnerable;
         vidaActual -= cantidad;
+
         if (vidaActual <= 0)
         {
             vidaActual = 0;
@@ -125,17 +130,59 @@ public class JugadorControlador : MonoBehaviour, IDaniable
         if (estaMuerto) return;
 
         estaMuerto = true;
+        moverX = 0f;
+
+        if (rb != null)
+        {
+            rb.velocity = new Vector2(0f, rb.velocity.y);
+        }
+
         if (anim != null)
         {
+            anim.SetBool("Corriendo", false);
+            anim.SetBool("Muerto", true);
             anim.SetTrigger("Morir");
         }
+
+        StartCoroutine(FrenarCaidaMuerte());
+    }
+
+    public void MarcarEnAgua(bool estado)
+    {
+        enAgua = estado;
+    }
+
+    private IEnumerator FrenarCaidaMuerte()
+    {
+        float tiempoEspera = 0f;
+        while (tiempoEspera < 2f)
+        {
+            if (enAgua && rb != null && rb.velocity.y < -0.5f)
+            {
+                yield return new WaitForSeconds(0.07f);
+                break;
+            }
+            tiempoEspera += Time.deltaTime;
+            yield return null;
+        }
+
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.gravityScale = 0f;
+        }
+    }
+
+    public bool EstaMuerto()
+    {
+        return estaMuerto;
     }
 
     void ActualizarAnimaciones()
     {
-        if (anim == null) return;
+        if (anim == null || estaMuerto) return;
 
-        anim.SetBool("Corriendo", Mathf.Abs(moverX) > 0.01f && !estaMuerto);
+        anim.SetBool("Corriendo", Mathf.Abs(moverX) > 0.01f);
         anim.SetBool("EnSuelo", enSuelo);
     }
 

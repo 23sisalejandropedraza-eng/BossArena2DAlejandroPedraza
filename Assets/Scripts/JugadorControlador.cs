@@ -178,6 +178,8 @@ public class JugadorControlador : MonoBehaviour, IDaniable
         return estaMuerto;
     }
 
+    public int VidaActual => vidaActual;
+    
     void ActualizarAnimaciones()
     {
         if (anim == null || estaMuerto) return;

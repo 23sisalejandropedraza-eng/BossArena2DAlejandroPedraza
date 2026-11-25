@@ -9,11 +9,17 @@ public class EnemigoBoss : MonoBehaviour, IDaniable
     public int danoAlJugador = 1;
     public float cooldownGolpe = 1.2f;
     public float duracionGolpe = 0.5f;
+    public float retrasoDanoGolpe = 0.25f;
 
     [Header("Patrulla y orientacion")]
     public float velocidadPatrulla = 2f;
     public float distanciaPatrulla = 2f;
     public bool spriteMiraIzquierdaPorDefecto = true;
+
+    [Header("Audio")]
+    public AudioClip sonidoMuerte;
+    [Range(0f, 1f)]
+    public float volumenMuerte = 1f;
 
     private int vidaActual;
     private float puntoInicialX;
@@ -53,6 +59,11 @@ public class EnemigoBoss : MonoBehaviour, IDaniable
                 estaGolpeando = false;
             }
 
+            if (jugadorEnZona != null)
+            {
+                MirarHaciaJugador(jugadorEnZona);
+            }
+
             if (anim != null)
             {
                 anim.SetBool("Camina", false);
@@ -60,9 +71,19 @@ public class EnemigoBoss : MonoBehaviour, IDaniable
             return;
         }
 
-        if (jugadorEnZona != null && temporizadorGolpe <= 0f)
+        if (jugadorEnZona != null)
         {
-            EjecutarGolpe(jugadorEnZona);
+            MirarHaciaJugador(jugadorEnZona);
+
+            if (anim != null)
+            {
+                anim.SetBool("Camina", false);
+            }
+
+            if (temporizadorGolpe <= 0f)
+            {
+                EjecutarGolpe(jugadorEnZona);
+            }
             return;
         }
 
@@ -82,8 +103,21 @@ public class EnemigoBoss : MonoBehaviour, IDaniable
         }
     }
 
+    void MirarHaciaJugador(JugadorControlador jugador)
+    {
+        if (jugador == null) return;
+
+        float diferenciaX = jugador.transform.position.x - transform.position.x;
+        if (Mathf.Abs(diferenciaX) > 0.05f)
+        {
+            direccion = diferenciaX > 0f ? 1 : -1;
+            AplicarFlip();
+        }
+    }
+
     void EjecutarGolpe(JugadorControlador jugador)
     {
+        MirarHaciaJugador(jugador);
         temporizadorGolpe = cooldownGolpe;
         temporizadorAnimGolpe = duracionGolpe;
         estaGolpeando = true;
@@ -94,6 +128,15 @@ public class EnemigoBoss : MonoBehaviour, IDaniable
             anim.ResetTrigger("Golpear");
             anim.SetTrigger("Golpear");
         }
+
+        StartCoroutine(AplicarDanoTrasRetraso(jugador));
+    }
+
+    private IEnumerator AplicarDanoTrasRetraso(JugadorControlador jugador)
+    {
+        yield return new WaitForSeconds(retrasoDanoGolpe);
+
+        if (estaMuerto || jugador == null || jugadorEnZona == null) yield break;
 
         jugador.RecibirDano(danoAlJugador);
     }
@@ -156,6 +199,12 @@ public class EnemigoBoss : MonoBehaviour, IDaniable
         estaMuerto = true;
         estaGolpeando = false;
         jugadorEnZona = null;
+        StopAllCoroutines();
+
+        if (sonidoMuerte != null)
+        {
+            AudioSource.PlayClipAtPoint(sonidoMuerte, transform.position, volumenMuerte);
+        }
 
         if (anim != null)
         {

@@ -22,12 +22,18 @@ public class JugadorControlador : MonoBehaviour, IDaniable
     [Header("Vida")]
     public int vidaMaxima = 5;
     public float tiempoInvulnerable = 1f;
+    public float duracionColorDanio = 0.2f;
+    public Color colorDanio = new Color(1f, 0.3f, 0.3f);
+
     private int vidaActual;
     private bool estaMuerto;
     private float finInvulnerabilidad;
 
     private Rigidbody2D rb;
     private Animator anim;
+    private SpriteRenderer spriteRenderer;
+    private Coroutine rutinaColorDanio;
+
     private float moverX;
     private bool enSuelo;
     private float siguienteAtaque;
@@ -37,6 +43,7 @@ public class JugadorControlador : MonoBehaviour, IDaniable
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         vidaActual = vidaMaxima;
     }
 
@@ -118,11 +125,33 @@ public class JugadorControlador : MonoBehaviour, IDaniable
         finInvulnerabilidad = Time.time + tiempoInvulnerable;
         vidaActual -= cantidad;
 
+        ActivarEfectoColorDanio();
+
         if (vidaActual <= 0)
         {
             vidaActual = 0;
             Morir();
         }
+    }
+
+    private void ActivarEfectoColorDanio()
+    {
+        if (spriteRenderer == null) return;
+
+        if (rutinaColorDanio != null)
+        {
+            StopCoroutine(rutinaColorDanio);
+        }
+
+        rutinaColorDanio = StartCoroutine(EfectoColorDanio());
+    }
+
+    private IEnumerator EfectoColorDanio()
+    {
+        spriteRenderer.color = colorDanio;
+        yield return new WaitForSeconds(duracionColorDanio);
+        spriteRenderer.color = Color.white;
+        rutinaColorDanio = null;
     }
 
     public void Morir()
@@ -131,6 +160,11 @@ public class JugadorControlador : MonoBehaviour, IDaniable
 
         estaMuerto = true;
         moverX = 0f;
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = Color.white;
+        }
 
         if (rb != null)
         {

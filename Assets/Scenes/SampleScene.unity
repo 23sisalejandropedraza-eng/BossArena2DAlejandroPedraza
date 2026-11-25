@@ -2646,7 +2646,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67a5cf7821efc6b49abf84b1f2038112, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vidaMaxima: 3
+  vidaMaxima: 7
   danoAlJugador: 1
   cooldownGolpe: 1
   duracionGolpe: 0.75
@@ -3067,7 +3067,7 @@ MonoBehaviour:
   radioAtaque: 1
   danoAtaque: 1
   tiempoEntreAtaques: 0.35
-  vidaMaxima: 5
+  vidaMaxima: 10
   tiempoInvulnerable: 1
 --- !u!1 &950952127
 GameObject:

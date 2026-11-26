@@ -16,10 +16,10 @@ public class EnemigoBoss : MonoBehaviour, IDaniable
     public float distanciaPatrulla = 2f;
     public bool spriteMiraIzquierdaPorDefecto = true;
 
-    [Header("Audio")]
+    [Header("Audio y desbloqueo")]
     public AudioClip sonidoMuerte;
-    [Range(0f, 1f)]
     public float volumenMuerte = 1f;
+    public GameObject objetoBloqueoCamino;
 
     private int vidaActual;
     private float puntoInicialX;
@@ -199,11 +199,13 @@ public class EnemigoBoss : MonoBehaviour, IDaniable
         estaMuerto = true;
         estaGolpeando = false;
         jugadorEnZona = null;
-        StopAllCoroutines();
+
+        float duracionAudio = 0f;
 
         if (sonidoMuerte != null)
         {
             AudioSource.PlayClipAtPoint(sonidoMuerte, transform.position, volumenMuerte);
+            duracionAudio = sonidoMuerte.length;
         }
 
         if (anim != null)
@@ -220,11 +222,21 @@ public class EnemigoBoss : MonoBehaviour, IDaniable
             col.enabled = false;
         }
 
-        Invoke(nameof(DesactivarBoss), 1.0f);
+        StartCoroutine(SecuenciaMuerteYDesbloqueo(duracionAudio));
     }
 
-    void DesactivarBoss()
+    private IEnumerator SecuenciaMuerteYDesbloqueo(float duracionAudio)
     {
+        float espera = Mathf.Max(1.0f, duracionAudio);
+        Debug.Log("Esperando " + espera + "s para desbloquear...");
+        yield return new WaitForSeconds(espera);
+
+        Debug.Log("Desbloqueando camino ahora");
+        if (objetoBloqueoCamino != null)
+        {
+            objetoBloqueoCamino.SetActive(false);
+        }
+
         gameObject.SetActive(false);
     }
 }

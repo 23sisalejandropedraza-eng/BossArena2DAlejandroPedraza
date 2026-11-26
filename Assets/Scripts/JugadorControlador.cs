@@ -134,6 +134,17 @@ public class JugadorControlador : MonoBehaviour, IDaniable
         }
     }
 
+    public bool Curar(int cantidad)
+    {
+        if (estaMuerto || vidaActual >= vidaMaxima)
+        {
+            return false;
+        }
+
+        vidaActual = Mathf.Min(vidaActual + cantidad, vidaMaxima);
+        return true;
+    }
+
     private void ActivarEfectoColorDanio()
     {
         if (spriteRenderer == null) return;

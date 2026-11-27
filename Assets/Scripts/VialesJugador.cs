@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class VialesJugador : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class VialesJugador : MonoBehaviour
     [Header("Referencia y UI")]
     public JugadorControlador jugador;
     public Slider barraVida;
+    public TMP_Text textoViales; 
 
     void Awake()
     {
@@ -26,7 +28,7 @@ public class VialesJugador : MonoBehaviour
     void Start()
     {
         viales = Mathf.Clamp(viales, 0, maxViales);
-        ActualizarBarra();
+        ActualizarUI();
     }
 
     void Update()
@@ -45,16 +47,27 @@ public class VialesJugador : MonoBehaviour
         if (jugador.Curar(curacion))
         {
             viales--;
-            ActualizarBarra();
+            ActualizarUI();
         }
     }
 
-    private void ActualizarBarra()
+    public void RestaurarViales()
+    {
+        viales = maxViales;
+        ActualizarUI();
+    }
+
+    public void ActualizarUI()
     {
         if (barraVida != null && jugador != null)
         {
             barraVida.maxValue = jugador.vidaMaxima;
             barraVida.value = jugador.VidaActual;
+        }
+
+        if (textoViales != null)
+        {
+            textoViales.text = "Viales: " + viales;
         }
     }
 }

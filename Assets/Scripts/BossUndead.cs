@@ -32,7 +32,7 @@ public class BossUndead : MonoBehaviour, IDaniable
     public AudioClip sonidoMuerte;
     public float volumenMuerte = 1f;
 
-    [Header("Fin del juego")]
+    [Header("Fin del juego (victoria boss)")]
     public GameObject panelJuegoTerminado;
     public Button botonReiniciar;
 

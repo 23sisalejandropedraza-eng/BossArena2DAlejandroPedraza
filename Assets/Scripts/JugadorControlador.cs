@@ -29,11 +29,13 @@ public class JugadorControlador : MonoBehaviour, IDaniable
     private int vidaActual;
     private bool estaMuerto;
     private float finInvulnerabilidad;
+    private float gravedadInicial;
 
     private Rigidbody2D rb;
     private Animator anim;
     private SpriteRenderer spriteRenderer;
     private Coroutine rutinaColorDanio;
+    private Coroutine rutinaCaidaMuerte;
 
     private float moverX;
     private bool enSuelo;
@@ -47,6 +49,11 @@ public class JugadorControlador : MonoBehaviour, IDaniable
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         vidaActual = vidaMaxima;
+
+        if (rb != null)
+        {
+            gravedadInicial = rb.gravityScale;
+        }
     }
 
     void Update()
@@ -153,6 +160,11 @@ public class JugadorControlador : MonoBehaviour, IDaniable
 
         ActivarEfectoColorDanio();
 
+        if (TryGetComponent<VialesJugador>(out VialesJugador viales))
+        {
+            viales.ActualizarUI();
+        }
+
         if (vidaActual <= 0)
         {
             vidaActual = 0;
@@ -215,7 +227,55 @@ public class JugadorControlador : MonoBehaviour, IDaniable
             anim.SetTrigger("Morir");
         }
 
-        StartCoroutine(FrenarCaidaMuerte());
+        if (rutinaCaidaMuerte != null)
+        {
+            StopCoroutine(rutinaCaidaMuerte);
+        }
+        rutinaCaidaMuerte = StartCoroutine(FrenarCaidaMuerte());
+
+        if (GestorProgresoJugador.Instancia != null)
+        {
+            GestorProgresoJugador.Instancia.NotificarMuerteJugador();
+        }
+    }
+
+    public void ReaparecerEn(Vector3 posicion)
+    {
+        if (rutinaCaidaMuerte != null)
+        {
+            StopCoroutine(rutinaCaidaMuerte);
+            rutinaCaidaMuerte = null;
+        }
+
+        transform.position = posicion;
+        vidaActual = vidaMaxima;
+        estaMuerto = false;
+        finInvulnerabilidad = Time.time + 0.5f;
+        moverX = 0f;
+        enAgua = false;
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = Color.white;
+        }
+
+        if (rb != null)
+        {
+            rb.gravityScale = gravedadInicial;
+            rb.velocity = Vector2.zero;
+        }
+
+        if (anim != null)
+        {
+            anim.SetBool("Muerto", false);
+            anim.ResetTrigger("Morir");
+            anim.Play("Idle", 0, 0f);
+        }
+
+        if (TryGetComponent<VialesJugador>(out VialesJugador viales))
+        {
+            viales.RestaurarViales();
+        }
     }
 
     public void MarcarEnAgua(bool estado)
@@ -242,6 +302,8 @@ public class JugadorControlador : MonoBehaviour, IDaniable
             rb.velocity = Vector2.zero;
             rb.gravityScale = 0f;
         }
+
+        rutinaCaidaMuerte = null;
     }
 
     public bool EstaMuerto()

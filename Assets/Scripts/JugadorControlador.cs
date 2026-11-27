@@ -12,6 +12,7 @@ public class JugadorControlador : MonoBehaviour, IDaniable
     public Transform puntoSuelo;
     public float radioSuelo = 0.2f;
     public LayerMask capaSuelo;
+    public float margenSuelo = 0.08f;
 
     [Header("Ataque")]
     public Transform puntoAtaque;
@@ -36,6 +37,7 @@ public class JugadorControlador : MonoBehaviour, IDaniable
 
     private float moverX;
     private bool enSuelo;
+    private float tiempoSinSuelo;
     private float siguienteAtaque;
     private bool enAgua;
 
@@ -67,14 +69,13 @@ public class JugadorControlador : MonoBehaviour, IDaniable
             transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
 
-        if (puntoSuelo != null)
-        {
-            enSuelo = Physics2D.OverlapCircle(puntoSuelo.position, radioSuelo, capaSuelo);
-        }
+        ActualizarEstadoSuelo();
 
         if (Input.GetKeyDown(KeyCode.Space) && enSuelo)
         {
             rb.velocity = new Vector2(rb.velocity.x, fuerzaSalto);
+            enSuelo = false;
+            tiempoSinSuelo = margenSuelo;
         }
 
         if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.J)) && Time.time >= siguienteAtaque)
@@ -84,6 +85,31 @@ public class JugadorControlador : MonoBehaviour, IDaniable
         }
 
         ActualizarAnimaciones();
+    }
+
+    void ActualizarEstadoSuelo()
+    {
+        if (puntoSuelo == null)
+        {
+            enSuelo = false;
+            return;
+        }
+
+        bool detectaSuelo = Physics2D.OverlapCircle(puntoSuelo.position, radioSuelo, capaSuelo);
+
+        if (detectaSuelo)
+        {
+            tiempoSinSuelo = 0f;
+            enSuelo = true;
+        }
+        else
+        {
+            tiempoSinSuelo += Time.deltaTime;
+            if (tiempoSinSuelo > margenSuelo)
+            {
+                enSuelo = false;
+            }
+        }
     }
 
     void FixedUpdate()
@@ -222,6 +248,8 @@ public class JugadorControlador : MonoBehaviour, IDaniable
     {
         return estaMuerto;
     }
+
+    public bool EnSuelo => enSuelo;
 
     public int VidaActual => vidaActual;
 

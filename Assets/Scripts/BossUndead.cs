@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class BossUndead : MonoBehaviour, IDaniable
 {
@@ -26,10 +28,13 @@ public class BossUndead : MonoBehaviour, IDaniable
     public float retrasoSalidaEmbestida = 0.2f;
     public float rangoDanoEmbestida = 2.8f;
 
-    [Header("Audio y desbloqueo")]
+    [Header("Audio")]
     public AudioClip sonidoMuerte;
     public float volumenMuerte = 1f;
-    public GameObject objetoBloqueoCamino;
+
+    [Header("Fin del juego")]
+    public GameObject panelJuegoTerminado;
+    public Button botonReiniciar;
 
     private int vidaActual;
     private float puntoInicialX;
@@ -52,6 +57,16 @@ public class BossUndead : MonoBehaviour, IDaniable
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         AplicarFlip();
+
+        if (panelJuegoTerminado != null)
+        {
+            panelJuegoTerminado.SetActive(false);
+        }
+
+        if (botonReiniciar != null)
+        {
+            botonReiniciar.onClick.AddListener(ReiniciarJuego);
+        }
     }
 
     void Update()
@@ -302,19 +317,26 @@ public class BossUndead : MonoBehaviour, IDaniable
             col.enabled = false;
         }
 
-        StartCoroutine(SecuenciaMuerteYDesbloqueo(duracionAudio));
+        StartCoroutine(SecuenciaMuerteYFinJuego(duracionAudio));
     }
 
-    private IEnumerator SecuenciaMuerteYDesbloqueo(float duracionAudio)
+    private IEnumerator SecuenciaMuerteYFinJuego(float duracionAudio)
     {
         float espera = Mathf.Max(1.0f, duracionAudio);
         yield return new WaitForSeconds(espera);
 
-        if (objetoBloqueoCamino != null)
+        if (panelJuegoTerminado != null)
         {
-            objetoBloqueoCamino.SetActive(false);
+            panelJuegoTerminado.SetActive(true);
+            Time.timeScale = 0f;
         }
 
         gameObject.SetActive(false);
+    }
+
+    public void ReiniciarJuego()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
